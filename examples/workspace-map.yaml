@@ -1,0 +1,46 @@
+# workspace-map.yaml — example configuration
+#
+# Place this file at the root of your workspace or pass it with --config.
+# Run `wmap rebuild` after editing to regenerate the index.
+
+repos:
+  - path: ~/projects/myapp
+    name: myapp
+    description: "Flutter mobile app — screens, widgets, services, state"
+
+  - path: ~/projects/myapp-backend
+    name: backend
+    description: "Firebase Cloud Functions — HTTP endpoints, Firestore triggers, IAP validation"
+
+  - path: ~/projects/shared-dart
+    name: shared
+    description: "Shared Dart packages — models, utilities, constants used by app and backend"
+
+# Additional directories to index that aren't git repos
+extra_dirs:
+  - path: ~/.claude/skills
+    name: cc-skills
+    description: "Claude Code skill scripts"
+  - path: ~/.claude/rules
+    name: cc-rules
+    description: "Claude Code rule files loaded per project"
+
+# Synonym expansion — terms that should match each other in search
+synonyms:
+  - [auth, authentication, login, signin, sign-in]
+  - [iap, in_app_purchase, purchase, subscription, billing]
+  - [roast, analyze, caption, describe, generate]
+  - [kibble, currency, credits, balance, tokens]
+  - [widget, component, screen, view, page]
+
+# Directories to exclude from indexing (glob patterns, relative to repo root)
+exclude:
+  - "**/.dart_tool/**"
+  - "**/build/**"
+  - "**/generated/**"
+  - "**/*.g.dart"
+  - "**/*.freezed.dart"
+  - "**/node_modules/**"
+
+# Index output location (default: ~/.cache/workspace-map/<workspace-name>.index.json)
+# index_path: ~/my-custom-index.json
