@@ -31,8 +31,8 @@ wmap init
 wmap rebuild
 
 # Search
-wmap find "economy service kibble deduction"
-wmap find "dart class handling iap purchase"
+wmap find "authentication service"
+wmap find "database migration handler"
 wmap find "hook that fires before tool use"
 ```
 
@@ -194,12 +194,6 @@ handles one language.
 See `src/workspace_map/extractors/dart.py` for a complete reference
 implementation with class/method/constant extraction and doc-comment
 purpose inference.
-
-## Sponsoring
-
-If workspace-map saves you time, consider sponsoring development:
-
-[![GitHub Sponsors](https://img.shields.io/badge/Sponsor-%E2%9D%A4%EF%B8%8F-ea4aaa?logo=github)](https://github.com/sponsors/Evey-Vendetta)
 
 ## License
 
