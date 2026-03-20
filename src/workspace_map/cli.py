@@ -125,6 +125,7 @@ def format_entry(entry: dict) -> str:
 # Config / index helpers
 # ---------------------------------------------------------------------------
 
+
 def _require_config() -> Config:
     """Load config or print a helpful error and exit."""
     cfg = load_config()
@@ -143,7 +144,7 @@ def _require_config() -> Config:
 
 def _load_index_or_exit(cfg: Config | None = None) -> dict:
     """Load the index, suggesting rebuild if empty."""
-    index_path = (cfg.index_path if cfg and cfg.index_path else None)
+    index_path = cfg.index_path if cfg and cfg.index_path else None
     index = load_index(index_path)
     if not index.get("entries"):
         print(yellow("Index is empty. Run: wmap rebuild"), file=sys.stderr)
@@ -154,6 +155,7 @@ def _load_index_or_exit(cfg: Config | None = None) -> dict:
 # ---------------------------------------------------------------------------
 # Subcommand handlers
 # ---------------------------------------------------------------------------
+
 
 def cmd_init(args: argparse.Namespace) -> None:
     """Scan cwd for git repos and generate workspace-map.yaml."""
@@ -178,12 +180,14 @@ def cmd_init(args: argparse.Namespace) -> None:
 
     repo_dicts = []
     for r in repos:
-        repo_dicts.append({
-            "name": r.name,
-            "path": r.path,
-            "lang": r.lang,
-            "glob": r.glob,
-        })
+        repo_dicts.append(
+            {
+                "name": r.name,
+                "path": r.path,
+                "lang": r.lang,
+                "glob": r.glob,
+            }
+        )
 
     data: dict = {
         "repos": repo_dicts,
@@ -196,7 +200,7 @@ def cmd_init(args: argparse.Namespace) -> None:
     print(green(f"Wrote {normalize_path(out_path)}"))
     for r in repos:
         print(f"  {r.name:<20} {r.path}  ({r.lang})")
-    print(f"\nNext: run `wmap rebuild` to build the index.")
+    print("\nNext: run `wmap rebuild` to build the index.")
 
 
 def cmd_find(args: argparse.Namespace) -> None:
@@ -216,6 +220,7 @@ def cmd_find(args: argparse.Namespace) -> None:
 
     if getattr(args, "semantic", False) and results:
         from workspace_map.reranker import rerank_with_haiku
+
         results = rerank_with_haiku(args.query, results)
         results = results[:limit]
 
@@ -385,8 +390,18 @@ def cmd_stats(args: argparse.Namespace) -> None:
     print(f"  Generated:  {generated or 'never'}")
     print(f"  Version:    {version}")
     print(f"  Entries:    {len(entries)} total")
-    for cat in ["code", "hook", "memory", "skill", "plan", "script", "session",
-                "agent", "command", "rule"]:
+    for cat in [
+        "code",
+        "hook",
+        "memory",
+        "skill",
+        "plan",
+        "script",
+        "session",
+        "agent",
+        "command",
+        "rule",
+    ]:
         count = counts.get(cat, 0)
         if count:
             print(f"    {cat:<12} {count}")
@@ -443,6 +458,7 @@ def _do_build(args: argparse.Namespace, force: bool) -> None:
         try:
             from workspace_map.claude_code import find_project_dirs
             from workspace_map.claude_code.sessions import index_sessions_basic
+
             print("  Scanning sessions...")
             for proj in find_project_dirs():
                 proj_path = proj["path"]
@@ -464,12 +480,17 @@ def _do_build(args: argparse.Namespace, force: bool) -> None:
     if force and getattr(args, "aliases", False):
         try:
             import asyncio
+
             from workspace_map.claude_code.sessions import generate_aliases_batch  # type: ignore
+
             code_entries = [e for e in new_entries if e.get("category") == "code"]
             if code_entries:
                 print("  Generating aliases...")
-                asyncio.run(generate_aliases_batch(code_entries, state_cache, force_all=True,
-                                                   verbose=verbose))
+                asyncio.run(
+                    generate_aliases_batch(
+                        code_entries, state_cache, force_all=True, verbose=verbose
+                    )
+                )
         except (ImportError, AttributeError):
             pass
 
@@ -532,9 +553,8 @@ def cmd_consolidate(args: argparse.Namespace) -> None:
 
     # Collect memory dirs from all project dirs
     from workspace_map.claude_code import find_project_dirs
-    mem_dirs = [
-        p["memory_dir"] for p in find_project_dirs() if p["memory_dir"]
-    ]
+
+    mem_dirs = [p["memory_dir"] for p in find_project_dirs() if p["memory_dir"]]
 
     if not mem_dirs:
         print("No memory directories found.")
@@ -559,7 +579,7 @@ def cmd_consolidate(args: argparse.Namespace) -> None:
 
             first_line = ""
             try:
-                with open(fpath, "r", encoding="utf-8") as f:
+                with open(fpath, encoding="utf-8") as f:
                     in_frontmatter = False
                     for line in f:
                         stripped = line.strip()
@@ -589,7 +609,8 @@ def cmd_consolidate(args: argparse.Namespace) -> None:
         "1. merge: groups of 2+ files covering the same topic\n"
         "2. stale: files not modified in >30 days that may be outdated\n"
         "3. duplicate: files with near-identical content\n\n"
-        "Respond with JSON: {{\"merge\": [[...]], \"stale\": [...], \"duplicate\": [...], \"notes\": \"...\"}}"
+        'Respond with JSON: {{"merge": [[...]], "stale": [...], "duplicate": [...],'
+        ' "notes": "..."}}'
     )
 
     entries_text = "\n".join(entries)
@@ -651,6 +672,7 @@ def cmd_install_hook(args: argparse.Namespace) -> None:
     dry_run = getattr(args, "dry_run", False)
     try:
         from workspace_map.claude_code.hook import install_hook
+
         result = install_hook(dry_run=dry_run)
     except RuntimeError as e:
         print(red(f"Error: {e}"), file=sys.stderr)
@@ -673,13 +695,16 @@ def cmd_install_hook(args: argparse.Namespace) -> None:
     else:
         print(yellow("settings.json already contained the hook entry."))
 
-    print("\nThe PreToolUse hook will now block exploratory Glob calls and "
-          "suggest `wmap find` instead.")
+    print(
+        "\nThe PreToolUse hook will now block exploratory Glob calls and "
+        "suggest `wmap find` instead."
+    )
 
 
 # ---------------------------------------------------------------------------
 # Argument parser
 # ---------------------------------------------------------------------------
+
 
 def build_parser(cc_available: bool) -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
@@ -697,16 +722,26 @@ def build_parser(cc_available: bool) -> argparse.ArgumentParser:
     p_find.add_argument("--type", help="Filter by language (dart, py, sh, js, md, rust)")
     p_find.add_argument(
         "--scope",
-        help="Filter by category (code, hook, memory, skill, plan, script, session, agent, command, rule)",
+        help=(
+            "Filter by category"
+            " (code, hook, memory, skill, plan, script, session, agent, command, rule)"
+        ),
     )
     p_find.add_argument("--json", action="store_true", help="Output as JSON")
     p_find.add_argument("--verbose", action="store_true", help="Show match scores and metadata")
-    p_find.add_argument("--semantic", action="store_true",
-                        help="Rerank results semantically via Haiku (requires claude in PATH)")
-    p_find.add_argument("--limit", type=int, default=10, metavar="N",
-                        help="Maximum results to return (default: 10)")
-    p_find.add_argument("--no-bm25", action="store_true",
-                        help="Disable BM25 scoring, use original keyword-bag scorer only")
+    p_find.add_argument(
+        "--semantic",
+        action="store_true",
+        help="Rerank results semantically via Haiku (requires claude in PATH)",
+    )
+    p_find.add_argument(
+        "--limit", type=int, default=10, metavar="N", help="Maximum results to return (default: 10)"
+    )
+    p_find.add_argument(
+        "--no-bm25",
+        action="store_true",
+        help="Disable BM25 scoring, use original keyword-bag scorer only",
+    )
 
     # repos
     sub.add_parser("repos", help="List indexed repos with file counts")
@@ -724,8 +759,9 @@ def build_parser(cc_available: bool) -> argparse.ArgumentParser:
     # rebuild
     p_rebuild = sub.add_parser("rebuild", help="Full re-index (all files)")
     p_rebuild.add_argument("--verbose", action="store_true", help="Print each entry as indexed")
-    p_rebuild.add_argument("--aliases", action="store_true",
-                           help="Force regeneration of all aliases")
+    p_rebuild.add_argument(
+        "--aliases", action="store_true", help="Force regeneration of all aliases"
+    )
 
     # CC-only commands — only added when ~/.claude/ exists
     if cc_available:
@@ -737,8 +773,11 @@ def build_parser(cc_available: bool) -> argparse.ArgumentParser:
         sub.add_parser("consolidate", help="Propose memory dedup suggestions via Haiku")
 
         p_hook = sub.add_parser("install-hook", help="Install PreToolUse Glob hook for Claude Code")
-        p_hook.add_argument("--dry-run", action="store_true",
-                            help="Show what would be installed without making changes")
+        p_hook.add_argument(
+            "--dry-run",
+            action="store_true",
+            help="Show what would be installed without making changes",
+        )
 
     return parser
 

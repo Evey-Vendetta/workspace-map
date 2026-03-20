@@ -5,21 +5,26 @@ import os
 import re
 
 from workspace_map.config import normalize_path
-from workspace_map.index import read_file_safe, file_state
+from workspace_map.index import file_state, read_file_safe
 from workspace_map.tokenizer import extract_keywords
 
 # ---------------------------------------------------------------------------
 # Regex patterns
 # ---------------------------------------------------------------------------
 
-SYSTEM_REMINDER_RE = re.compile(r"<system-reminder>.*?</system-reminder>", re.DOTALL | re.IGNORECASE)
+SYSTEM_REMINDER_RE = re.compile(
+    r"<system-reminder>.*?</system-reminder>", re.DOTALL | re.IGNORECASE
+)
 XML_TAG_RE = re.compile(r"<[^>]+>.*?</[^>]+>|<[^>]+/>", re.DOTALL)
 HANDOFF_SESSION_RE = re.compile(r"^## (\d{4}-\d{2}-\d{2}) — Session (\d+): (.+)$", re.MULTILINE)
 
 # Prefixes that indicate system-injected content, not real user messages
 SYSTEM_CONTENT_PREFIXES = (
-    "<local-command-caveat>", "<ide_opened_file>", "<ide_action>",
-    "<system-reminder>", "<available-deferred-tools>",
+    "<local-command-caveat>",
+    "<ide_opened_file>",
+    "<ide_action>",
+    "<system-reminder>",
+    "<available-deferred-tools>",
 )
 
 
@@ -139,7 +144,8 @@ def index_sessions_basic(
         return entries
 
     jsonl_files = [
-        f for f in os.listdir(transcripts_real)
+        f
+        for f in os.listdir(transcripts_real)
         if f.endswith(".jsonl") and os.path.isfile(os.path.join(transcripts_real, f))
     ]
 
@@ -150,7 +156,8 @@ def index_sessions_basic(
         if not force and not _is_changed(norm, state_cache, real_path):
             continue
 
-        content = read_file_safe(real_path, max_bytes=262144)  # 256KB — large sessions can have late first user msg
+        # 256KB — large sessions can have late first user msg
+        content = read_file_safe(real_path, max_bytes=262144)
         lines = content.splitlines()
 
         first_user_msg = ""

@@ -4,14 +4,13 @@ import glob as glob_module
 import json
 import os
 from collections import defaultdict
-from datetime import datetime
 
 from workspace_map.config import (
     Config,
     RepoConfig,
+    default_index_path,
     expand_path,
     normalize_path,
-    default_index_path,
 )
 from workspace_map.extractors import extract_symbols
 from workspace_map.extractors.markdown import purpose_markdown
@@ -27,9 +26,10 @@ SKIP_DIRS = {".git", "build", ".dart_tool", "node_modules", "__pycache__", ".gra
 # File utilities
 # ---------------------------------------------------------------------------
 
+
 def read_file_safe(path: str, max_bytes: int = 8192) -> str:
     try:
-        with open(path, "r", encoding="utf-8", errors="replace") as f:
+        with open(path, encoding="utf-8", errors="replace") as f:
             return f.read(max_bytes)
     except OSError:
         return ""
@@ -55,6 +55,7 @@ def extract_frontmatter(content: str) -> dict:
 # State / delta helpers
 # ---------------------------------------------------------------------------
 
+
 def file_state(path: str) -> dict:
     try:
         st = os.stat(path)
@@ -75,6 +76,7 @@ def is_changed(norm_path: str, state_cache: dict, real_path: str) -> bool:
 # Per-category purpose dispatch (used by indexers that need category context)
 # ---------------------------------------------------------------------------
 
+
 def _extract_purpose_by_category(path: str, category: str, content: str | None = None) -> str:
     """Extract purpose with category-aware frontmatter handling."""
     if content is None:
@@ -88,9 +90,11 @@ def _extract_purpose_by_category(path: str, category: str, content: str | None =
 
     if ext == ".dart":
         from workspace_map.extractors.dart import purpose_dart
+
         return purpose_dart(path, content)
     if ext == ".js":
         from workspace_map.extractors.javascript import purpose_js
+
         return purpose_js(path, content)
     if ext == ".py":
         return purpose_python(path, content)
@@ -104,6 +108,7 @@ def _extract_purpose_by_category(path: str, category: str, content: str | None =
 # ---------------------------------------------------------------------------
 # Code file indexer
 # ---------------------------------------------------------------------------
+
 
 def index_code_files(
     repo: RepoConfig,
@@ -160,6 +165,7 @@ def index_code_files(
 # Repo tree walker
 # ---------------------------------------------------------------------------
 
+
 def walk_repo_tree(repo_path: str) -> list:
     """Walk repo and collect file metadata (path, size, mtime) without reading content."""
     tree = []
@@ -172,11 +178,13 @@ def walk_repo_tree(repo_path: str) -> list:
             real = os.path.join(dirpath, fname)
             try:
                 st = os.stat(real)
-                tree.append({
-                    "path": normalize_path(real),
-                    "size": st.st_size,
-                    "mtime": st.st_mtime,
-                })
+                tree.append(
+                    {
+                        "path": normalize_path(real),
+                        "size": st.st_size,
+                        "mtime": st.st_mtime,
+                    }
+                )
             except OSError:
                 continue
     return tree
@@ -195,6 +203,7 @@ def build_file_tree(repos: list[RepoConfig]) -> dict:
 # ---------------------------------------------------------------------------
 # CC infra indexers (operate on explicit directory paths from Config)
 # ---------------------------------------------------------------------------
+
 
 def index_hooks(
     hooks_dir: str,
@@ -359,7 +368,7 @@ def index_skills(
             "purpose": purpose,
             "keywords": kw,
             "mtime": file_state(real_path)["mtime"],
-            "_real": real_path,   # SKILL.md file, not directory — matches is_changed key
+            "_real": real_path,  # SKILL.md file, not directory — matches is_changed key
             "_state_key": normalize_path(real_path),  # explicit key for build_state
         }
         if verbose:
@@ -450,6 +459,7 @@ def index_scripts(
                 purpose = purpose_shell(real_path, content)
             elif ext == ".js":
                 from workspace_map.extractors.javascript import purpose_js
+
                 purpose = purpose_js(real_path, content)
             else:
                 purpose = fname
@@ -577,6 +587,7 @@ def index_agents_and_commands(
 # Top-level index_all orchestrator
 # ---------------------------------------------------------------------------
 
+
 def index_all(
     config: Config,
     state_cache: dict,
@@ -601,6 +612,7 @@ def index_all(
     if config.claude_code_enabled != "false":
         try:
             from workspace_map.claude_code.infra import index_cc_infra
+
             entries.extend(
                 index_cc_infra(config, state_cache, overrides, hook_wiring or {}, force, verbose)
             )
@@ -614,6 +626,7 @@ def index_all(
 # Index load / save
 # ---------------------------------------------------------------------------
 
+
 def load_index(index_path: str | None = None) -> dict:
     real = expand_path(index_path or default_index_path())
     if not os.path.exists(real):
@@ -626,7 +639,7 @@ def load_index(index_path: str | None = None) -> dict:
             "file_tree": {},
         }
     try:
-        with open(real, "r", encoding="utf-8") as f:
+        with open(real, encoding="utf-8") as f:
             return json.load(f)
     except (json.JSONDecodeError, OSError):
         return {

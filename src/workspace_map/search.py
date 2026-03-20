@@ -4,7 +4,7 @@ import math
 import os
 import time
 
-from workspace_map.tokenizer import tokenize, DEFAULT_SYNONYMS
+from workspace_map.tokenizer import DEFAULT_SYNONYMS, tokenize
 
 # ---------------------------------------------------------------------------
 # BM25 constants
@@ -25,6 +25,7 @@ _DECAY_FLOOR = 0.1
 # ---------------------------------------------------------------------------
 # Scoring
 # ---------------------------------------------------------------------------
+
 
 def score_entry(
     entry: dict,
@@ -264,6 +265,7 @@ def blended_score(
 # find() — library-facing search function
 # ---------------------------------------------------------------------------
 
+
 def find(
     query: str,
     index: dict,
@@ -340,13 +342,18 @@ def find(
                     if token in te_fname:
                         ts += 0.3
                 if ts > 0:
-                    scored.append((ts, {
-                        "path": te["path"],
-                        "category": "file_tree",
-                        "purpose": "",
-                        "repo": repo_name,
-                        "size": te.get("size", 0),
-                    }))
+                    scored.append(
+                        (
+                            ts,
+                            {
+                                "path": te["path"],
+                                "category": "file_tree",
+                                "purpose": "",
+                                "repo": repo_name,
+                                "size": te.get("size", 0),
+                            },
+                        )
+                    )
 
     scored.sort(key=lambda x: -x[0])
     return scored[:max_results]

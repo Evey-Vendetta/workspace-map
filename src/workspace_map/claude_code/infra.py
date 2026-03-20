@@ -11,7 +11,6 @@ from collections import defaultdict
 
 from workspace_map.claude_code import get_claude_code_paths
 
-
 # ---------------------------------------------------------------------------
 # Hook wiring parser
 # ---------------------------------------------------------------------------
@@ -35,7 +34,7 @@ def parse_hook_wiring(cc_paths: dict) -> dict:
         if not os.path.exists(sf_exp):
             continue
         try:
-            with open(sf_exp, "r", encoding="utf-8") as f:
+            with open(sf_exp, encoding="utf-8") as f:
                 data = json.load(f)
         except (json.JSONDecodeError, OSError):
             continue
@@ -92,16 +91,16 @@ def index_cc_infra(
     Returns:
         List of index entries for all CC infra files.
     """
+    from workspace_map.claude_code import find_project_dirs
     from workspace_map.index import (
+        index_agents_and_commands,
         index_hooks,
         index_memory,
-        index_skills,
         index_plans,
-        index_scripts,
         index_rules,
-        index_agents_and_commands,
+        index_scripts,
+        index_skills,
     )
-    from workspace_map.claude_code import find_project_dirs
 
     entries: list = []
     cc_paths = get_claude_code_paths()
@@ -116,14 +115,25 @@ def index_cc_infra(
     # Hooks
     hooks_dir = cc_paths.get("hooks", "")
     if hooks_dir:
-        entries.extend(index_hooks(
-            hooks_dir, state_cache, overrides, hook_wiring, force, verbose, synonyms,
-        ))
+        entries.extend(
+            index_hooks(
+                hooks_dir,
+                state_cache,
+                overrides,
+                hook_wiring,
+                force,
+                verbose,
+                synonyms,
+            )
+        )
 
     # Memory — auto-discover from all project memory dirs
     mem_dirs: list[str] = []
-    if (config and hasattr(config, "claude_code_memory_dir")
-            and config.claude_code_memory_dir not in ("auto", "")):
+    if (
+        config
+        and hasattr(config, "claude_code_memory_dir")
+        and config.claude_code_memory_dir not in ("auto", "")
+    ):
         mem_dirs = [config.claude_code_memory_dir]
     else:
         for proj in find_project_dirs():
@@ -131,37 +141,72 @@ def index_cc_infra(
                 mem_dirs.append(proj["memory_dir"])
 
     for mem_dir in mem_dirs:
-        entries.extend(index_memory(
-            mem_dir, state_cache, overrides, force, verbose, synonyms,
-        ))
+        entries.extend(
+            index_memory(
+                mem_dir,
+                state_cache,
+                overrides,
+                force,
+                verbose,
+                synonyms,
+            )
+        )
 
     # Skills
     skills_dir = cc_paths.get("skills", "")
     if skills_dir:
-        entries.extend(index_skills(
-            skills_dir, state_cache, overrides, force, verbose, synonyms,
-        ))
+        entries.extend(
+            index_skills(
+                skills_dir,
+                state_cache,
+                overrides,
+                force,
+                verbose,
+                synonyms,
+            )
+        )
 
     # Plans
     plans_dir = cc_paths.get("plans", "")
     if plans_dir:
-        entries.extend(index_plans(
-            plans_dir, state_cache, overrides, force, verbose, synonyms,
-        ))
+        entries.extend(
+            index_plans(
+                plans_dir,
+                state_cache,
+                overrides,
+                force,
+                verbose,
+                synonyms,
+            )
+        )
 
     # Scripts
     scripts_dir = cc_paths.get("scripts", "")
     if scripts_dir:
-        entries.extend(index_scripts(
-            scripts_dir, state_cache, overrides, force, verbose, synonyms,
-        ))
+        entries.extend(
+            index_scripts(
+                scripts_dir,
+                state_cache,
+                overrides,
+                force,
+                verbose,
+                synonyms,
+            )
+        )
 
     # Rules
     rules_dir = cc_paths.get("rules", "")
     if rules_dir:
-        entries.extend(index_rules(
-            rules_dir, state_cache, overrides, force, verbose, synonyms,
-        ))
+        entries.extend(
+            index_rules(
+                rules_dir,
+                state_cache,
+                overrides,
+                force,
+                verbose,
+                synonyms,
+            )
+        )
 
     # Agents and commands (global only from cc_paths; project dirs via config)
     agent_sources: list[tuple[str, str, str]] = []
@@ -173,14 +218,21 @@ def index_cc_infra(
         agent_sources.append((commands_dir, "command", "global"))
 
     # Project-specific agent/command dirs from config
-    for extra_dir in (getattr(config, "extra_agent_dirs", None) or []):
+    for extra_dir in getattr(config, "extra_agent_dirs", None) or []:
         agent_sources.append((extra_dir, "agent", "project"))
-    for extra_dir in (getattr(config, "extra_command_dirs", None) or []):
+    for extra_dir in getattr(config, "extra_command_dirs", None) or []:
         agent_sources.append((extra_dir, "command", "project"))
 
     if agent_sources:
-        entries.extend(index_agents_and_commands(
-            agent_sources, state_cache, overrides, force, verbose, synonyms,
-        ))
+        entries.extend(
+            index_agents_and_commands(
+                agent_sources,
+                state_cache,
+                overrides,
+                force,
+                verbose,
+                synonyms,
+            )
+        )
 
     return entries

@@ -1,7 +1,5 @@
 """Tests for workspace_map.extractors (all language extractors)."""
 
-import pytest
-
 from workspace_map.extractors import EXTRACTORS, extract_purpose, extract_symbols
 from workspace_map.extractors.dart import extract_symbols_dart, purpose_dart
 from workspace_map.extractors.javascript import extract_symbols_js, purpose_js
@@ -9,10 +7,10 @@ from workspace_map.extractors.markdown import purpose_markdown
 from workspace_map.extractors.python import extract_symbols_python, purpose_python
 from workspace_map.extractors.shell import extract_symbols_shell, purpose_shell
 
-
 # ---------------------------------------------------------------------------
 # Helper: find a symbol by kind/name
 # ---------------------------------------------------------------------------
+
 
 def find_symbol(symbols, kind, name):
     return next((s for s in symbols if s["kind"] == kind and s["name"] == name), None)
@@ -21,6 +19,7 @@ def find_symbol(symbols, kind, name):
 # ---------------------------------------------------------------------------
 # Dart extractor
 # ---------------------------------------------------------------------------
+
 
 class TestDartExtractor:
     def test_class_extracted(self, dart_source):
@@ -80,6 +79,7 @@ class TestDartExtractor:
 # Python extractor
 # ---------------------------------------------------------------------------
 
+
 class TestPythonExtractor:
     def test_class_extracted(self, python_source):
         syms = extract_symbols_python(python_source)
@@ -137,6 +137,7 @@ class TestPythonExtractor:
 # JavaScript extractor
 # ---------------------------------------------------------------------------
 
+
 class TestJavaScriptExtractor:
     def test_exported_class_extracted(self, js_source):
         syms = extract_symbols_js(js_source)
@@ -185,6 +186,7 @@ class TestJavaScriptExtractor:
 # Shell extractor
 # ---------------------------------------------------------------------------
 
+
 class TestShellExtractor:
     def test_function_with_parens_extracted(self, shell_source):
         syms = extract_symbols_shell(shell_source)
@@ -231,6 +233,7 @@ class TestShellExtractor:
 # Markdown extractor
 # ---------------------------------------------------------------------------
 
+
 class TestMarkdownExtractor:
     def test_purpose_from_h1_header(self, markdown_source):
         purpose = purpose_markdown("arch.md", markdown_source)
@@ -264,6 +267,7 @@ class TestMarkdownExtractor:
 # ---------------------------------------------------------------------------
 # Registry dispatch
 # ---------------------------------------------------------------------------
+
 
 class TestExtractorRegistry:
     def test_dart_dispatch_returns_symbols(self, dart_source):

@@ -66,8 +66,19 @@ def extract_symbols_dart(content: str) -> list:
                 stripped,
             )
             if m and m.group(1) not in (
-                "if", "else", "for", "while", "switch", "return",
-                "class", "enum", "mixin", "extension", "import", "export", "part",
+                "if",
+                "else",
+                "for",
+                "while",
+                "switch",
+                "return",
+                "class",
+                "enum",
+                "mixin",
+                "extension",
+                "import",
+                "export",
+                "part",
             ):
                 symbols.append({"kind": "function", "name": m.group(1)})
                 continue
@@ -92,7 +103,9 @@ def purpose_dart(path: str, content: str) -> str:
     method_re = re.compile(
         r"(?:Future|Stream|void|String|int|bool|double|List|Map|dynamic)\s+(\w+)\s*\("
     )
-    methods = [m2.group(1) for m2 in method_re.finditer(content) if not m2.group(1).startswith("_")][:3]
+    methods = [
+        m2.group(1) for m2 in method_re.finditer(content) if not m2.group(1).startswith("_")
+    ][:3]
 
     import_re = re.compile(r"import ['\"]package:([^/'\".]+)")
     imports = list(dict.fromkeys(import_re.findall(content)))[:3]

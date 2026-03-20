@@ -24,12 +24,15 @@ def extract_purpose(path: str, content: str, language: str) -> str:
     if language in EXTRACTORS:
         return EXTRACTORS[language]["purpose"](path, content)
     import os
+
     return os.path.splitext(os.path.basename(path))[0]
 
 
 # Auto-import all built-in extractors so they self-register
-from workspace_map.extractors import dart  # noqa: E402, F401
-from workspace_map.extractors import python  # noqa: E402, F401
-from workspace_map.extractors import javascript  # noqa: E402, F401
-from workspace_map.extractors import shell  # noqa: E402, F401
-from workspace_map.extractors import markdown  # noqa: E402, F401
+from workspace_map.extractors import (  # noqa: E402
+    dart,  # noqa: F401
+    javascript,  # noqa: F401
+    markdown,  # noqa: F401
+    python,  # noqa: F401
+    shell,  # noqa: F401
+)

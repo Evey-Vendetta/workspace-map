@@ -37,10 +37,12 @@ def find_project_dirs() -> list[dict]:
         proj_path = os.path.join(projects_dir, entry)
         if os.path.isdir(proj_path):
             memory_dir = os.path.join(proj_path, "memory")
-            results.append({
-                "name": entry,
-                "path": proj_path,
-                "has_memory": os.path.isdir(memory_dir),
-                "memory_dir": memory_dir if os.path.isdir(memory_dir) else None,
-            })
+            results.append(
+                {
+                    "name": entry,
+                    "path": proj_path,
+                    "has_memory": os.path.isdir(memory_dir),
+                    "memory_dir": memory_dir if os.path.isdir(memory_dir) else None,
+                }
+            )
     return results

@@ -2,7 +2,6 @@
 
 import json
 import os
-import shutil
 import sys
 
 # The hook script content — generalized from workspace-map-reminder.py.
@@ -21,7 +20,10 @@ Or manually copy to ~/.claude/hooks/ and register in ~/.claude/settings.json:
     {
         "hooks": {
             "PreToolUse": [
-                {"matcher": "Glob", "hooks": [{"type": "command", "command": "python ~/.claude/hooks/workspace-map-reminder.py"}]}
+                {"matcher": "Glob", "hooks": [
+                    {"type": "command",
+                     "command": "python ~/.claude/hooks/workspace-map-reminder.py"}
+                ]}
             ]
         }
     }
@@ -84,7 +86,7 @@ def _register_in_settings(settings_path: str) -> bool:
     """
     if os.path.exists(settings_path):
         try:
-            with open(settings_path, "r", encoding="utf-8") as f:
+            with open(settings_path, encoding="utf-8") as f:
                 settings = json.load(f)
         except (json.JSONDecodeError, OSError):
             settings = {}
@@ -103,10 +105,12 @@ def _register_in_settings(settings_path: str) -> bool:
                 return False  # Already registered
 
     # Append the new entry
-    pre_tool_use.append({
-        "matcher": "Glob",
-        "hooks": [{"type": "command", "command": hook_cmd}],
-    })
+    pre_tool_use.append(
+        {
+            "matcher": "Glob",
+            "hooks": [{"type": "command", "command": hook_cmd}],
+        }
+    )
 
     tmp_path = settings_path + ".tmp"
     try:
@@ -176,6 +180,7 @@ def install_hook(dry_run: bool = False) -> dict:
     if sys.platform != "win32":
         try:
             import stat
+
             st = os.stat(hook_path)
             os.chmod(hook_path, st.st_mode | stat.S_IEXEC | stat.S_IXGRP | stat.S_IXOTH)
         except OSError:

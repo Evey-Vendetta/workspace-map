@@ -1,14 +1,8 @@
 """Tests for workspace_map.index (build, delta detection, incremental update, categories)."""
 
-import json
 import os
-import time
-from pathlib import Path
-from unittest.mock import patch
 
-import pytest
-
-from workspace_map.config import Config, RepoConfig
+from workspace_map.config import RepoConfig
 from workspace_map.index import (
     INDEX_VERSION,
     build_state,
@@ -25,10 +19,10 @@ from workspace_map.index import (
     strip_internal_fields,
 )
 
-
 # ---------------------------------------------------------------------------
 # extract_frontmatter
 # ---------------------------------------------------------------------------
+
 
 class TestExtractFrontmatter:
     def test_parses_description_field(self):
@@ -58,6 +52,7 @@ class TestExtractFrontmatter:
 # ---------------------------------------------------------------------------
 # file_state / is_changed
 # ---------------------------------------------------------------------------
+
 
 class TestFileState:
     def test_returns_mtime_and_size(self, tmp_path):
@@ -107,6 +102,7 @@ class TestIsChanged:
 # index_code_files
 # ---------------------------------------------------------------------------
 
+
 class TestIndexCodeFiles:
     def test_indexes_python_file(self, tmp_path):
         repo_dir = tmp_path / "myrepo"
@@ -129,7 +125,16 @@ class TestIndexCodeFiles:
         repo = RepoConfig(name="myrepo", path=str(repo_dir), lang="py", glob="**/*.py")
         entries = index_code_files(repo, {}, {}, force=True, verbose=False)
         entry = entries[0]
-        for field in ("path", "repo", "category", "language", "purpose", "keywords", "symbols", "mtime"):
+        for field in (
+            "path",
+            "repo",
+            "category",
+            "language",
+            "purpose",
+            "keywords",
+            "symbols",
+            "mtime",
+        ):  # noqa: E501
             assert field in entry
 
     def test_purpose_extracted_from_docstring(self, tmp_path):
@@ -153,7 +158,7 @@ class TestIndexCodeFiles:
         state = build_state(entries1)
 
         # Strip _real so we have a clean normalized state cache
-        norm_path = entries1[0]["path"]
+        # (entries1[0]["path"] is the normalized key used in state cache)
         # Second pass with state cache — file hasn't changed, should return empty
         entries2 = index_code_files(repo, state, {}, force=False, verbose=False)
         assert len(entries2) == 0
@@ -188,6 +193,7 @@ class TestIndexCodeFiles:
 # ---------------------------------------------------------------------------
 # index_memory
 # ---------------------------------------------------------------------------
+
 
 class TestIndexMemory:
     def test_indexes_md_file_in_memory_dir(self, tmp_path):
@@ -246,6 +252,7 @@ class TestIndexMemory:
 # index_plans
 # ---------------------------------------------------------------------------
 
+
 class TestIndexPlans:
     def test_indexes_md_file(self, tmp_path):
         plans_dir = tmp_path / "plans"
@@ -280,6 +287,7 @@ class TestIndexPlans:
 # index_rules
 # ---------------------------------------------------------------------------
 
+
 class TestIndexRules:
     def test_indexes_rule_md_file(self, tmp_path):
         rules_dir = tmp_path / "rules"
@@ -300,6 +308,7 @@ class TestIndexRules:
 # ---------------------------------------------------------------------------
 # load_index / save_index
 # ---------------------------------------------------------------------------
+
 
 class TestLoadSaveIndex:
     def test_load_nonexistent_returns_empty_structure(self, tmp_path):
@@ -331,6 +340,7 @@ class TestLoadSaveIndex:
 # strip_internal_fields
 # ---------------------------------------------------------------------------
 
+
 class TestStripInternalFields:
     def test_strips_underscore_prefixed_keys(self):
         entries = [{"path": "~/x.py", "_real": "/real/x.py", "purpose": "test"}]
@@ -347,19 +357,44 @@ class TestStripInternalFields:
 # compute_corpus_stats
 # ---------------------------------------------------------------------------
 
+
 class TestComputeCorpusStats:
     def test_N_equals_number_of_entries(self):
         entries = [
-            {"path": "~/a.py", "purpose": "alpha service", "keywords": ["alpha"], "symbols": [], "aliases": []},
-            {"path": "~/b.py", "purpose": "beta service", "keywords": ["beta"], "symbols": [], "aliases": []},
+            {
+                "path": "~/a.py",
+                "purpose": "alpha service",
+                "keywords": ["alpha"],
+                "symbols": [],
+                "aliases": [],
+            },
+            {
+                "path": "~/b.py",
+                "purpose": "beta service",
+                "keywords": ["beta"],
+                "symbols": [],
+                "aliases": [],
+            },
         ]
         stats = compute_corpus_stats(entries)
         assert stats["N"] == 2
 
     def test_df_tracks_term_document_frequency(self):
         entries = [
-            {"path": "~/a.py", "purpose": "economy balance", "keywords": ["economy"], "symbols": [], "aliases": []},
-            {"path": "~/b.py", "purpose": "economy roast", "keywords": ["roast"], "symbols": [], "aliases": []},
+            {
+                "path": "~/a.py",
+                "purpose": "economy balance",
+                "keywords": ["economy"],
+                "symbols": [],
+                "aliases": [],
+            },
+            {
+                "path": "~/b.py",
+                "purpose": "economy roast",
+                "keywords": ["roast"],
+                "symbols": [],
+                "aliases": [],
+            },
         ]
         stats = compute_corpus_stats(entries)
         # "economy" appears in both documents
@@ -369,7 +404,13 @@ class TestComputeCorpusStats:
 
     def test_avgdl_computed_per_field(self):
         entries = [
-            {"path": "~/a.py", "purpose": "alpha service", "keywords": [], "symbols": [], "aliases": []},
+            {
+                "path": "~/a.py",
+                "purpose": "alpha service",
+                "keywords": [],
+                "symbols": [],
+                "aliases": [],
+            },
         ]
         stats = compute_corpus_stats(entries)
         assert "purpose" in stats["avgdl"]
@@ -384,6 +425,7 @@ class TestComputeCorpusStats:
 # ---------------------------------------------------------------------------
 # build_state
 # ---------------------------------------------------------------------------
+
 
 class TestBuildState:
     def test_state_built_from_real_files(self, tmp_path):

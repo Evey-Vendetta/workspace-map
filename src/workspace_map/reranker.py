@@ -14,6 +14,7 @@ import sys
 
 try:
     import anthropic  # noqa: F401
+
     HAS_ANTHROPIC = True
 except ImportError:
     HAS_ANTHROPIC = False
@@ -22,7 +23,9 @@ except ImportError:
 # Rerank prompt
 # ---------------------------------------------------------------------------
 
-HAIKU_RERANK_PROMPT = """Given this search query and list of workspace entries, re-score each entry from 0.0 to 10.0 based on semantic relevance. Consider synonyms, domain concepts, and intent — not just keywords.
+HAIKU_RERANK_PROMPT = """Given this search query and list of workspace entries, re-score each
+entry from 0.0 to 10.0 based on semantic relevance. Consider synonyms, domain concepts,
+and intent — not just keywords.
 
 Query: {query}
 
@@ -36,6 +39,7 @@ Respond with only the JSON array, no other text."""
 # ---------------------------------------------------------------------------
 # Reranker
 # ---------------------------------------------------------------------------
+
 
 def rerank_with_haiku(query: str, candidates: list) -> list:
     """Re-rank search results using Haiku for semantic relevance.

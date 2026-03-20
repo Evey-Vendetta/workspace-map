@@ -1,13 +1,9 @@
 """Tests for workspace_map.search (BM25F scoring and find())."""
 
-import math
 import time
-
-import pytest
 
 from workspace_map.search import (
     _DECAY_FLOOR,
-    _DECAY_LAMBDA,
     blended_score,
     bm25_score_entry,
     find,
@@ -15,10 +11,10 @@ from workspace_map.search import (
 )
 from workspace_map.tokenizer import tokenize
 
-
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
+
 
 def make_entry(
     path="~/projects/myrepo/lib/economy_service.dart",
@@ -45,12 +41,14 @@ def make_entry(
 
 def simple_corpus_stats(entries):
     from workspace_map.index import compute_corpus_stats
+
     return compute_corpus_stats(entries)
 
 
 # ---------------------------------------------------------------------------
 # score_entry (keyword-bag scorer)
 # ---------------------------------------------------------------------------
+
 
 class TestScoreEntry:
     def test_filename_match_adds_score(self):
@@ -100,10 +98,7 @@ class TestScoreEntry:
     def test_synonym_in_purpose_adds_score(self):
         entry = make_entry(purpose="manages economy and balance")
         # "kibble" -> "economy" synonym
-        score_with_syn = score_entry(
-            entry, "kibble", ["kibble"],
-            synonyms={"kibble": "economy"}
-        )
+        score_with_syn = score_entry(entry, "kibble", ["kibble"], synonyms={"kibble": "economy"})
         score_without_syn = score_entry(entry, "kibble", ["kibble"], synonyms={})
         assert score_with_syn > score_without_syn
 
@@ -127,6 +122,7 @@ class TestScoreEntry:
 # ---------------------------------------------------------------------------
 # bm25_score_entry
 # ---------------------------------------------------------------------------
+
 
 class TestBM25ScoreEntry:
     def test_zero_for_empty_query(self):
@@ -180,6 +176,7 @@ class TestBM25ScoreEntry:
 # blended_score
 # ---------------------------------------------------------------------------
 
+
 class TestBlendedScore:
     def test_falls_back_to_original_without_corpus_stats(self):
         entry = make_entry(purpose="economy balance kibble")
@@ -189,7 +186,10 @@ class TestBlendedScore:
         assert blended == orig
 
     def test_blended_is_different_from_pure_original(self):
-        entries = [make_entry(), make_entry(path="~/camera.dart", purpose="camera", keywords=["camera"])]
+        entries = [
+            make_entry(),
+            make_entry(path="~/camera.dart", purpose="camera", keywords=["camera"]),
+        ]
         corpus = simple_corpus_stats(entries)
         entry = entries[0]
         tokens = tokenize("economy", filter_stops=False)
@@ -199,8 +199,8 @@ class TestBlendedScore:
         assert blended != orig or orig == 0.0
 
     def test_time_decay_reduces_score_for_old_files(self):
-        new_entry = make_entry(mtime=time.time() - 3600)       # 1 hour old
-        old_entry = make_entry(mtime=time.time() - 86400 * 365) # 1 year old
+        new_entry = make_entry(mtime=time.time() - 3600)  # 1 hour old
+        old_entry = make_entry(mtime=time.time() - 86400 * 365)  # 1 year old
 
         entries = [new_entry, old_entry]
         corpus = simple_corpus_stats(entries)
@@ -243,6 +243,7 @@ class TestBlendedScore:
 # find()
 # ---------------------------------------------------------------------------
 
+
 class TestFind:
     def test_returns_list_of_tuples(self, sample_index):
         results = find("economy", sample_index)
@@ -282,16 +283,18 @@ class TestFind:
     def test_type_filter_dart_excludes_other_langs(self, sample_index):
         # Add a Python entry to sample index to confirm filtering
         index = dict(sample_index)
-        entries = list(index["entries"]) + [{
-            "path": "~/projects/roast.py",
-            "repo": "myrepo",
-            "category": "code",
-            "language": "py",
-            "purpose": "economy roast service Python",
-            "keywords": ["economy", "roast"],
-            "symbols": [],
-            "mtime": time.time(),
-        }]
+        entries = list(index["entries"]) + [
+            {
+                "path": "~/projects/roast.py",
+                "repo": "myrepo",
+                "category": "code",
+                "language": "py",
+                "purpose": "economy roast service Python",
+                "keywords": ["economy", "roast"],
+                "symbols": [],
+                "mtime": time.time(),
+            }
+        ]
         index["entries"] = entries
         results = find("economy", index, type_filter="dart")
         langs = {e.get("language") for _, e in results}
@@ -299,16 +302,18 @@ class TestFind:
 
     def test_type_filter_py_includes_only_python(self, sample_index):
         index = dict(sample_index)
-        entries = list(index["entries"]) + [{
-            "path": "~/projects/economy.py",
-            "repo": "myrepo",
-            "category": "code",
-            "language": "py",
-            "purpose": "economy balance tracker",
-            "keywords": ["economy", "balance"],
-            "symbols": [],
-            "mtime": time.time(),
-        }]
+        entries = list(index["entries"]) + [
+            {
+                "path": "~/projects/economy.py",
+                "repo": "myrepo",
+                "category": "code",
+                "language": "py",
+                "purpose": "economy balance tracker",
+                "keywords": ["economy", "balance"],
+                "symbols": [],
+                "mtime": time.time(),
+            }
+        ]
         index["entries"] = entries
         results = find("economy", index, type_filter="py")
         for _, e in results:
@@ -342,6 +347,6 @@ class TestFind:
         # The rule entry is 30 days old — it should not outrank fresh code entries
         # for a query that also matches code files
         if len(results) >= 2:
-            # Just assert results are sorted (time-decay is already validated in blended_score tests)
+            # Just assert results are sorted (time-decay validated in blended_score tests)
             scores = [s for s, _ in results]
             assert scores == sorted(scores, reverse=True)

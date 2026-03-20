@@ -1,19 +1,16 @@
 """Tests for workspace_map.tokenizer."""
 
-import pytest
-
 from workspace_map.tokenizer import (
     DEFAULT_SYNONYMS,
-    STOP_WORDS,
     extract_keywords,
     merge_synonyms,
     tokenize,
 )
 
-
 # ---------------------------------------------------------------------------
 # tokenize — camelCase splitting
 # ---------------------------------------------------------------------------
+
 
 class TestCamelCaseSplitting:
     def test_pascal_case_splits_on_uppercase(self):
@@ -47,6 +44,7 @@ class TestCamelCaseSplitting:
 # tokenize — snake_case splitting
 # ---------------------------------------------------------------------------
 
+
 class TestSnakeCaseSplitting:
     def test_snake_case_splits_on_underscore(self):
         result = tokenize("roast_service", filter_stops=False)
@@ -70,6 +68,7 @@ class TestSnakeCaseSplitting:
 # ---------------------------------------------------------------------------
 # tokenize — stop word filtering
 # ---------------------------------------------------------------------------
+
 
 class TestStopWordFiltering:
     def test_stop_words_removed_by_default(self):
@@ -104,6 +103,7 @@ class TestStopWordFiltering:
 # tokenize — deduplication
 # ---------------------------------------------------------------------------
 
+
 class TestDeduplication:
     def test_dedupe_on_by_default(self):
         result = tokenize("roast roast roast")
@@ -122,6 +122,7 @@ class TestDeduplication:
 # ---------------------------------------------------------------------------
 # tokenize — empty / None handling
 # ---------------------------------------------------------------------------
+
 
 class TestEdgeCases:
     def test_empty_string_returns_empty_list(self):
@@ -145,6 +146,7 @@ class TestEdgeCases:
 # ---------------------------------------------------------------------------
 # extract_keywords — synonym expansion
 # ---------------------------------------------------------------------------
+
 
 class TestSynonymExpansion:
     def test_default_synonym_expanded(self):
@@ -186,6 +188,7 @@ class TestSynonymExpansion:
 # ---------------------------------------------------------------------------
 # merge_synonyms
 # ---------------------------------------------------------------------------
+
 
 class TestMergeSynonyms:
     def test_user_entries_override_defaults(self):

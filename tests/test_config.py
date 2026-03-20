@@ -1,15 +1,14 @@
 """Tests for workspace_map.config."""
 
+import importlib.util
 import os
 import textwrap
-from pathlib import Path
 from unittest.mock import patch
 
 import pytest
 
 from workspace_map.config import (
     Config,
-    RepoConfig,
     _parse_yaml_config,
     auto_discover_repos,
     detect_claude_code,
@@ -18,11 +17,7 @@ from workspace_map.config import (
     normalize_path,
 )
 
-try:
-    import yaml
-    HAS_YAML = True
-except ImportError:
-    HAS_YAML = False
+HAS_YAML = importlib.util.find_spec("yaml") is not None
 
 pytestmark = pytest.mark.skipif(not HAS_YAML, reason="pyyaml not installed")
 
@@ -30,6 +25,7 @@ pytestmark = pytest.mark.skipif(not HAS_YAML, reason="pyyaml not installed")
 # ---------------------------------------------------------------------------
 # normalize_path / expand_path
 # ---------------------------------------------------------------------------
+
 
 class TestPathUtilities:
     def test_expand_path_resolves_tilde(self):
@@ -59,6 +55,7 @@ class TestPathUtilities:
 # ---------------------------------------------------------------------------
 # _parse_yaml_config
 # ---------------------------------------------------------------------------
+
 
 class TestParseYamlConfig:
     def test_repos_parsed(self):
@@ -110,10 +107,12 @@ class TestParseYamlConfig:
 # load_config
 # ---------------------------------------------------------------------------
 
+
 class TestLoadConfig:
     def test_loads_valid_yaml_file(self, tmp_path):
         cfg = tmp_path / "workspace-map.yaml"
-        cfg.write_text(textwrap.dedent("""\
+        cfg.write_text(
+            textwrap.dedent("""\
             repos:
               - name: testrepo
                 path: /tmp/testrepo
@@ -121,7 +120,9 @@ class TestLoadConfig:
                 glob: "**/*.py"
             synonyms:
               kibble: economy
-        """), encoding="utf-8")
+        """),
+            encoding="utf-8",
+        )
         config = load_config(str(cfg))
         assert len(config.repos) == 1
         assert config.repos[0].name == "testrepo"
@@ -161,6 +162,7 @@ class TestLoadConfig:
 # ---------------------------------------------------------------------------
 # auto_discover_repos
 # ---------------------------------------------------------------------------
+
 
 class TestAutoDiscoverRepos:
     def test_discovers_git_repo_in_root(self, tmp_path):
@@ -237,12 +239,14 @@ class TestAutoDiscoverRepos:
 # detect_claude_code
 # ---------------------------------------------------------------------------
 
+
 class TestDetectClaudeCode:
     def test_returns_none_when_claude_dir_absent(self, tmp_path):
         # Point home to a temp dir that has no .claude subdir
         absent_home = tmp_path / "home_without_claude"
         absent_home.mkdir()
-        with patch("workspace_map.config.os.path.expanduser", return_value=str(absent_home / ".claude")):
+        claude_path = str(absent_home / ".claude")
+        with patch("workspace_map.config.os.path.expanduser", return_value=claude_path):
             result = detect_claude_code()
         assert result is None
 

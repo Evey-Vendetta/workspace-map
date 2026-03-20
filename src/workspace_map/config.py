@@ -2,7 +2,6 @@
 
 import os
 from dataclasses import dataclass, field
-from pathlib import Path
 
 import yaml
 
@@ -25,7 +24,7 @@ class Config:
     synonyms: dict[str, str] = field(default_factory=dict)
     directories: dict[str, str] = field(default_factory=dict)
     index_path: str = ""
-    claude_code_enabled: str = "auto"   # "auto", "true", "false"
+    claude_code_enabled: str = "auto"  # "auto", "true", "false"
     claude_code_sessions_dir: str = "auto"
     claude_code_memory_dir: str = "auto"
 
@@ -34,13 +33,14 @@ class Config:
 # Path utilities
 # ---------------------------------------------------------------------------
 
+
 def normalize_path(path: str) -> str:
     """Normalize path: resolve, forward slashes, ~ for home."""
     path = os.path.realpath(path)
     path = path.replace("\\", "/")
     home = os.path.expanduser("~").replace("\\", "/")
     if path.startswith(home):
-        path = "~" + path[len(home):]
+        path = "~" + path[len(home) :]
     return path
 
 
@@ -58,6 +58,7 @@ def short_path(norm_path: str) -> str:
 # Default index path
 # ---------------------------------------------------------------------------
 
+
 def default_index_path() -> str:
     """Return ~/.cache/workspace-map/index.json, creating the dir if needed."""
     cache_dir = os.path.join(os.path.expanduser("~"), ".cache", "workspace-map")
@@ -68,6 +69,7 @@ def default_index_path() -> str:
 # ---------------------------------------------------------------------------
 # Claude Code detection
 # ---------------------------------------------------------------------------
+
 
 def detect_claude_code() -> dict | None:
     """Check if ~/.claude/ exists and return paths to CC infrastructure.
@@ -167,10 +169,22 @@ def _detect_language(repo_path: str) -> tuple[str, str]:
     try:
         for dirpath, dirs, files in os.walk(repo_path):
             # Skip common non-source dirs
-            dirs[:] = [d for d in dirs if d not in {
-                ".git", "build", "node_modules", "__pycache__", ".dart_tool",
-                "target", "dist", "out", ".gradle",
-            }]
+            dirs[:] = [
+                d
+                for d in dirs
+                if d
+                not in {
+                    ".git",
+                    "build",
+                    "node_modules",
+                    "__pycache__",
+                    ".dart_tool",
+                    "target",
+                    "dist",
+                    "out",
+                    ".gradle",
+                }
+            ]
             for fname in files:
                 ext = os.path.splitext(fname)[1].lower()
                 if ext in _LANG_EXTENSIONS:
@@ -211,12 +225,14 @@ def auto_discover_repos(root: str | None = None, max_depth: int = 2) -> list[Rep
             seen.add(path)
             name = os.path.basename(path)
             lang, glob_pattern = _detect_language(path)
-            repos.append(RepoConfig(
-                name=name,
-                path=normalize_path(path),
-                lang=lang,
-                glob=glob_pattern,
-            ))
+            repos.append(
+                RepoConfig(
+                    name=name,
+                    path=normalize_path(path),
+                    lang=lang,
+                    glob=glob_pattern,
+                )
+            )
             return  # Don't recurse into nested git repos
 
         for entry in entries:
@@ -250,12 +266,14 @@ def _parse_yaml_config(data: dict) -> Config:
         glob_pattern = r.get("glob", "**/*")
         if glob_pattern.startswith(".."):
             raise ValueError(f"Glob pattern must not start with '..': {glob_pattern}")
-        repos.append(RepoConfig(
-            name=r["name"],
-            path=r["path"],
-            lang=r.get("lang", "unknown"),
-            glob=glob_pattern,
-        ))
+        repos.append(
+            RepoConfig(
+                name=r["name"],
+                path=r["path"],
+                lang=r.get("lang", "unknown"),
+                glob=glob_pattern,
+            )
+        )
 
     return Config(
         repos=repos,
@@ -292,7 +310,7 @@ def load_config(path: str | None = None) -> Config:
             continue
 
         try:
-            with open(real, "r", encoding="utf-8") as f:
+            with open(real, encoding="utf-8") as f:
                 data = yaml.safe_load(f) or {}
             return _parse_yaml_config(data)
         except Exception as exc:

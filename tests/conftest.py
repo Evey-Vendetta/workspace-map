@@ -1,16 +1,14 @@
 """Shared fixtures for workspace-map tests."""
 
-import json
-import os
 import time
 from pathlib import Path
 
 import pytest
 
-
 # ---------------------------------------------------------------------------
 # Filesystem helpers
 # ---------------------------------------------------------------------------
+
 
 @pytest.fixture
 def tmp_dir(tmp_path):
@@ -52,6 +50,7 @@ def sample_config_file(tmp_path):
 # ---------------------------------------------------------------------------
 # Sample index
 # ---------------------------------------------------------------------------
+
 
 @pytest.fixture
 def sample_index():
@@ -109,6 +108,7 @@ def sample_index():
 
     # Minimal corpus stats for BM25 tests
     from workspace_map.index import compute_corpus_stats
+
     corpus_stats = compute_corpus_stats(entries)
 
     return {
