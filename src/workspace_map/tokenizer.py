@@ -232,7 +232,7 @@ def merge_synonyms(user_synonyms: dict) -> dict:
 
 TOKEN_RE = re.compile(r"[a-zA-Z][a-zA-Z0-9_\-]{2,}")
 
-# camelCase / PascalCase splitter: "economyService" → ["economy", "Service"]
+# camelCase / PascalCase splitter: "billingService" → ["billing", "Service"]
 _CAMEL_RE = re.compile(r"[A-Z]?[a-z]+|[A-Z]+(?=[A-Z][a-z]|\d|\b)|[A-Z]+|\d+")
 
 

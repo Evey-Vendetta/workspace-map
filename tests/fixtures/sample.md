@@ -1,11 +1,11 @@
-# Roast Engine Architecture
+# Task Engine Architecture
 
-This document describes the AI roast pipeline from image capture to rendered output.
+This document describes the AI task pipeline from input to rendered output.
 
 ## Overview
 
-The roast engine processes images through Vertex AI using persona-specific prompts.
+The task engine processes inputs through an LLM using template-specific prompts.
 
-## Personas
+## Templates
 
-Each persona has a distinct voice and scoring rubric.
+Each template has a distinct voice and scoring rubric.

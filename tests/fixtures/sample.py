@@ -1,4 +1,4 @@
-"""Roast service — dispatches AI roast requests and caches results."""
+"""Task service — dispatches AI task requests and caches results."""
 
 import os
 
@@ -7,19 +7,19 @@ DEFAULT_TIMEOUT = 30
 CACHE_TTL = 3600
 
 
-class RoastService:
-    """Handles roast generation via Vertex AI."""
+class TaskService:
+    """Handles task generation via LLM."""
 
     def __init__(self, client):
         self.client = client
 
-    def generate_roast(self, image_path: str) -> str:
+    def run_task(self, image_path: str) -> str:
         return ""
 
     def get_cached(self, key: str):
         return None
 
-    def _build_prompt(self, persona: str) -> str:
+    def _build_prompt(self, template: str) -> str:
         return ""
 
 

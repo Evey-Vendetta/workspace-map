@@ -24,11 +24,11 @@ def find_symbol(symbols, kind, name):
 class TestDartExtractor:
     def test_class_extracted(self, dart_source):
         syms = extract_symbols_dart(dart_source)
-        assert find_symbol(syms, "class", "EconomyService") is not None
+        assert find_symbol(syms, "class", "BillingService") is not None
 
     def test_enum_extracted(self, dart_source):
         syms = extract_symbols_dart(dart_source)
-        assert find_symbol(syms, "enum", "RoastPersona") is not None
+        assert find_symbol(syms, "enum", "TaskTemplate") is not None
 
     def test_mixin_extracted(self, dart_source):
         syms = extract_symbols_dart(dart_source)
@@ -38,11 +38,11 @@ class TestDartExtractor:
         syms = extract_symbols_dart(dart_source)
         sym = find_symbol(syms, "method", "getBalance")
         assert sym is not None
-        assert sym.get("parent") == "EconomyService"
+        assert sym.get("parent") == "BillingService"
 
     def test_async_method_extracted(self, dart_source):
         syms = extract_symbols_dart(dart_source)
-        assert find_symbol(syms, "method", "deductKibble") is not None
+        assert find_symbol(syms, "method", "deductCredits") is not None
 
     def test_static_const_extracted(self, dart_source):
         syms = extract_symbols_dart(dart_source)
@@ -59,8 +59,8 @@ class TestDartExtractor:
 
     def test_purpose_uses_doc_comment(self, dart_source):
         purpose = purpose_dart("service.dart", dart_source)
-        assert "EconomyService" in purpose
-        assert "Kibble" in purpose or "economy" in purpose.lower()
+        assert "BillingService" in purpose
+        assert "Credits" in purpose or "billing" in purpose.lower()
 
     def test_purpose_fallback_to_class_name(self):
         code = "class MyWidget {}"
@@ -83,7 +83,7 @@ class TestDartExtractor:
 class TestPythonExtractor:
     def test_class_extracted(self, python_source):
         syms = extract_symbols_python(python_source)
-        assert find_symbol(syms, "class", "RoastService") is not None
+        assert find_symbol(syms, "class", "TaskService") is not None
 
     def test_second_class_extracted(self, python_source):
         syms = extract_symbols_python(python_source)
@@ -91,9 +91,9 @@ class TestPythonExtractor:
 
     def test_public_method_extracted(self, python_source):
         syms = extract_symbols_python(python_source)
-        sym = find_symbol(syms, "method", "generate_roast")
+        sym = find_symbol(syms, "method", "run_task")
         assert sym is not None
-        assert sym.get("parent") == "RoastService"
+        assert sym.get("parent") == "TaskService"
 
     def test_private_method_not_extracted(self, python_source):
         syms = extract_symbols_python(python_source)
@@ -117,8 +117,8 @@ class TestPythonExtractor:
         assert find_symbol(syms, "const", "my_var") is None
 
     def test_purpose_from_module_docstring(self, python_source):
-        purpose = purpose_python("roast_service.py", python_source)
-        assert "Roast service" in purpose or "roast" in purpose.lower()
+        purpose = purpose_python("task_service.py", python_source)
+        assert "Task service" in purpose or "task" in purpose.lower()
 
     def test_purpose_fallback_to_hash_comment(self):
         code = "# My utility script\nfoo = 1"
@@ -237,7 +237,7 @@ class TestShellExtractor:
 class TestMarkdownExtractor:
     def test_purpose_from_h1_header(self, markdown_source):
         purpose = purpose_markdown("arch.md", markdown_source)
-        assert purpose == "Roast Engine Architecture"
+        assert purpose == "Task Engine Architecture"
 
     def test_purpose_strips_hash_prefix(self, markdown_source):
         purpose = purpose_markdown("arch.md", markdown_source)

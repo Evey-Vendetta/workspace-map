@@ -1,4 +1,4 @@
-/** Analytics service — tracks roast events and user actions. */
+/** Analytics service — tracks task events and user actions. */
 
 export class AnalyticsService {
   constructor(config) {

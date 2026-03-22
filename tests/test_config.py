@@ -70,10 +70,10 @@ class TestParseYamlConfig:
         assert config.repos[0].lang == "dart"
 
     def test_synonyms_parsed(self):
-        data = {"synonyms": {"kibble": "economy", "vertex": "ai"}}
+        data = {"synonyms": {"credits": "billing", "llm": "ai"}}
         config = _parse_yaml_config(data)
-        assert config.synonyms["kibble"] == "economy"
-        assert config.synonyms["vertex"] == "ai"
+        assert config.synonyms["credits"] == "billing"
+        assert config.synonyms["llm"] == "ai"
 
     def test_index_path_parsed(self):
         data = {"index_path": "/tmp/test.json"}
@@ -119,14 +119,14 @@ class TestLoadConfig:
                 lang: py
                 glob: "**/*.py"
             synonyms:
-              kibble: economy
+              credits: billing
         """),
             encoding="utf-8",
         )
         config = load_config(str(cfg))
         assert len(config.repos) == 1
         assert config.repos[0].name == "testrepo"
-        assert config.synonyms["kibble"] == "economy"
+        assert config.synonyms["credits"] == "billing"
 
     def test_returns_empty_config_when_no_file_found(self, tmp_path):
         # Use a path that definitely doesn't exist and change cwd to avoid auto-discovery
@@ -176,11 +176,11 @@ class TestAutoDiscoverRepos:
         assert "myrepo" in names
 
     def test_discovered_repo_has_correct_name(self, tmp_path):
-        repo_dir = tmp_path / "clawed"
+        repo_dir = tmp_path / "myapp"
         repo_dir.mkdir()
         (repo_dir / ".git").mkdir()
         repos = auto_discover_repos(root=str(tmp_path))
-        assert repos[0].name == "clawed"
+        assert repos[0].name == "myapp"
 
     def test_discovered_repo_path_uses_forward_slashes(self, tmp_path):
         repo_dir = tmp_path / "myrepo"

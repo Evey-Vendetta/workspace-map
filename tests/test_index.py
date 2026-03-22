@@ -172,14 +172,14 @@ class TestIndexCodeFiles:
         repo_dir = tmp_path / "dartrepo"
         repo_dir.mkdir()
         (repo_dir / "service.dart").write_text(
-            "class EconomyService {\n  void getBalance() {}\n}\n",
+            "class BillingService {\n  void getBalance() {}\n}\n",
             encoding="utf-8",
         )
         repo = RepoConfig(name="dartrepo", path=str(repo_dir), lang="dart", glob="**/*.dart")
         entries = index_code_files(repo, {}, {}, force=True, verbose=False)
         assert len(entries) == 1
         syms = entries[0]["symbols"]
-        assert any(s["name"] == "EconomyService" for s in syms)
+        assert any(s["name"] == "BillingService" for s in syms)
 
     def test_category_assigned_as_code(self, tmp_path):
         repo_dir = tmp_path / "r"
@@ -215,7 +215,7 @@ class TestIndexMemory:
         mem_dir.mkdir()
         for fname, expected_type in [
             ("feedback_costs.md", "feedback"),
-            ("project_clawed.md", "project"),
+            ("project_myapp.md", "project"),
             ("reference_quota.md", "reference"),
             ("MEMORY.md", "main"),
             ("misc_notes.md", "misc"),
@@ -225,7 +225,7 @@ class TestIndexMemory:
         entries = index_memory(str(mem_dir), {}, {}, force=True, verbose=False)
         type_map = {os.path.basename(e["path"]): e["memory_type"] for e in entries}
         assert type_map.get("feedback_costs.md") == "feedback"
-        assert type_map.get("project_clawed.md") == "project"
+        assert type_map.get("project_myapp.md") == "project"
         assert type_map.get("reference_quota.md") == "reference"
         assert type_map.get("MEMORY.md") == "main"
         assert type_map.get("misc_notes.md") == "misc"
@@ -383,24 +383,24 @@ class TestComputeCorpusStats:
         entries = [
             {
                 "path": "~/a.py",
-                "purpose": "economy balance",
-                "keywords": ["economy"],
+                "purpose": "billing balance",
+                "keywords": ["billing"],
                 "symbols": [],
                 "aliases": [],
             },
             {
                 "path": "~/b.py",
-                "purpose": "economy roast",
-                "keywords": ["roast"],
+                "purpose": "billing task",
+                "keywords": ["task"],
                 "symbols": [],
                 "aliases": [],
             },
         ]
         stats = compute_corpus_stats(entries)
-        # "economy" appears in both documents
-        assert stats["df"].get("economy", 0) == 2
-        # "roast" appears in only one
-        assert stats["df"].get("roast", 0) == 1
+        # "billing" appears in both documents
+        assert stats["df"].get("billing", 0) == 2
+        # "task" appears in only one
+        assert stats["df"].get("task", 0) == 1
 
     def test_avgdl_computed_per_field(self):
         entries = [

@@ -14,18 +14,18 @@ from workspace_map.tokenizer import (
 
 class TestCamelCaseSplitting:
     def test_pascal_case_splits_on_uppercase(self):
-        result = tokenize("RoastService", filter_stops=False)
-        assert "roast" in result
+        result = tokenize("TaskService", filter_stops=False)
+        assert "task" in result
         assert "service" in result
 
     def test_camel_case_splits_lowercase_start(self):
-        result = tokenize("economyService", filter_stops=False)
-        assert "economy" in result
+        result = tokenize("billingService", filter_stops=False)
+        assert "billing" in result
         assert "service" in result
 
     def test_multi_word_pascal_case(self):
-        result = tokenize("EconomyServiceFactory", filter_stops=False)
-        assert "economy" in result
+        result = tokenize("BillingServiceFactory", filter_stops=False)
+        assert "billing" in result
         assert "service" in result
         assert "factory" in result
 
@@ -36,8 +36,8 @@ class TestCamelCaseSplitting:
         assert any("purchase" in t for t in lowered)
 
     def test_single_word_unchanged(self):
-        result = tokenize("roast", filter_stops=False)
-        assert result == ["roast"]
+        result = tokenize("task", filter_stops=False)
+        assert result == ["task"]
 
 
 # ---------------------------------------------------------------------------
@@ -47,8 +47,8 @@ class TestCamelCaseSplitting:
 
 class TestSnakeCaseSplitting:
     def test_snake_case_splits_on_underscore(self):
-        result = tokenize("roast_service", filter_stops=False)
-        assert "roast" in result
+        result = tokenize("task_service", filter_stops=False)
+        assert "task" in result
         assert "service" in result
 
     def test_multi_segment_snake_case(self):
@@ -58,10 +58,10 @@ class TestSnakeCaseSplitting:
         assert "factory" in result
 
     def test_path_like_string_with_slashes(self):
-        result = tokenize("lib/services/roast_service", filter_stops=False)
+        result = tokenize("lib/services/task_service", filter_stops=False)
         assert "lib" in result
         assert "services" in result
-        assert "roast" in result
+        assert "task" in result
         assert "service" in result
 
 
@@ -73,14 +73,14 @@ class TestSnakeCaseSplitting:
 class TestStopWordFiltering:
     def test_stop_words_removed_by_default(self):
         # "the" and "and" are stop words
-        result = tokenize("the roast and the cat")
+        result = tokenize("the task and the widget")
         assert "the" not in result
         assert "and" not in result
-        assert "roast" in result
-        assert "cat" in result
+        assert "task" in result
+        assert "widget" in result
 
     def test_stop_words_kept_when_filter_disabled(self):
-        result = tokenize("the roast", filter_stops=False)
+        result = tokenize("the task", filter_stops=False)
         assert "the" in result
 
     def test_short_tokens_filtered(self):
@@ -106,17 +106,17 @@ class TestStopWordFiltering:
 
 class TestDeduplication:
     def test_dedupe_on_by_default(self):
-        result = tokenize("roast roast roast")
-        assert result.count("roast") == 1
+        result = tokenize("task task task")
+        assert result.count("task") == 1
 
     def test_dedupe_off_preserves_duplicates(self):
-        result = tokenize("roast roast roast", dedupe=False)
-        assert result.count("roast") == 3
+        result = tokenize("task task task", dedupe=False)
+        assert result.count("task") == 3
 
     def test_dedupe_across_case_variants(self):
-        # "Roast" and "roast" both normalize to "roast"
-        result = tokenize("Roast roast")
-        assert result.count("roast") == 1
+        # "Task" and "task" both normalize to "task"
+        result = tokenize("Task task")
+        assert result.count("task") == 1
 
 
 # ---------------------------------------------------------------------------
@@ -138,9 +138,9 @@ class TestEdgeCases:
         assert tokenize("a b c", filter_stops=False) == []
 
     def test_hyphenated_words_split(self):
-        result = tokenize("flash-lite", filter_stops=False)
-        assert "flash" in result
-        assert "lite" in result
+        result = tokenize("open-api", filter_stops=False)
+        assert "open" in result
+        assert "api" in result
 
 
 # ---------------------------------------------------------------------------
@@ -159,25 +159,25 @@ class TestSynonymExpansion:
         assert "config" in result
 
     def test_custom_synonym_overrides_default(self):
-        custom = {"kibble": "credits"}
-        result = extract_keywords("kibble", synonyms=custom)
-        assert "credits" in result
-        # "economy" from default is NOT present because custom didn't include it
-        assert "economy" not in result
+        custom = {"credits": "funds"}
+        result = extract_keywords("credits", synonyms=custom)
+        assert "funds" in result
+        # "billing" from default is NOT present because custom didn't include it
+        assert "billing" not in result
 
     def test_no_synonyms_no_expansion(self):
-        result = extract_keywords("kibble", synonyms={})
-        assert "economy" not in result
-        assert "kibble" in result
+        result = extract_keywords("credits", synonyms={})
+        assert "billing" not in result
+        assert "credits" in result
 
     def test_extra_arg_included_in_tokens(self):
-        result = extract_keywords("roast", extra="service dart")
-        assert "roast" in result
+        result = extract_keywords("task", extra="service dart")
+        assert "task" in result
         # "dart" is not a stop word — should appear
         assert "dart" in result
 
     def test_max_kw_limits_results(self):
-        long_text = "roast economy balance camera screen service factory widget provider"
+        long_text = "task billing balance upload screen service factory widget provider"
         result = extract_keywords(long_text, max_kw=3)
         assert len(result) <= 3
 
@@ -192,8 +192,8 @@ class TestSynonymExpansion:
 
 class TestMergeSynonyms:
     def test_user_entries_override_defaults(self):
-        merged = merge_synonyms({"kibble": "coin"})
-        assert merged["kibble"] == "coin"
+        merged = merge_synonyms({"credits": "coin"})
+        assert merged["credits"] == "coin"
 
     def test_default_entries_preserved_when_not_overridden(self):
         merged = merge_synonyms({"mynew": "thing"})

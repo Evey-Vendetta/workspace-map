@@ -15,7 +15,7 @@ not just exact strings. Optional Claude Code integration auto-detected.
 - **BM25 ranking** — proper information retrieval scoring, not grep; documents ranked by relevance
 - **Symbol extraction** — classes, functions, methods, enums, constants extracted per language and included in search scoring
 - **Incremental updates** — mtime + size cache skips unchanged files; `wmap update` re-indexes only what changed
-- **Natural language search** — camelCase splitting (`economyService` → `economy service`), synonym expansion, stop word filtering
+- **Natural language search** — camelCase splitting (`billingService` → `billing service`), synonym expansion, stop word filtering
 - **Claude Code integration** — auto-detects `~/.claude/`; indexes hooks, skills, plans, memory files, rules, agents, commands, and session transcripts
 - **LLM reranking** — optional semantic reranking via Anthropic API (requires `pip install workspace-map[ai]`)
 
@@ -81,7 +81,7 @@ repos:
 
   - path: ~/projects/myapp-backend
     name: backend
-    description: "Firebase Cloud Functions — HTTP endpoints, Firestore triggers"
+    description: "Cloud Functions — HTTP endpoints, database triggers"
 
 # Additional non-git directories to index
 extra_dirs:
@@ -92,7 +92,7 @@ extra_dirs:
 # Synonym expansion — terms that map to each other in search
 synonyms:
   - [auth, authentication, login, signin]
-  - [iap, in_app_purchase, purchase, billing]
+  - [purchase, in_app_purchase, subscription, billing]
 
 # Patterns to exclude (relative to repo root)
 exclude:

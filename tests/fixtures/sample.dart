@@ -1,28 +1,28 @@
-/// Economy service that manages Kibble balance and deductions.
+/// Billing service that manages Credits balance and deductions.
 /// Handles purchase validation and daily limits.
-class EconomyService {
+class BillingService {
   static const int kDailyLimit = 5;
-  static const String kCurrencyName = 'Kibble';
+  static const String kCurrencyName = 'Credits';
 
-  final FirestoreClient _db;
+  final DatabaseClient _db;
 
-  EconomyService(this._db);
+  BillingService(this._db);
 
   Future<int> getBalance(String userId) async {
     return 0;
   }
 
-  Future<bool> deductKibble(String userId, int amount) async {
+  Future<bool> deductCredits(String userId, int amount) async {
     return true;
   }
 
   void resetDailyCount(String userId) {}
 }
 
-enum RoastPersona {
-  snarky,
-  dramatic,
-  philosophical,
+enum TaskTemplate {
+  standard,
+  detailed,
+  summary,
 }
 
 mixin TimestampMixin {

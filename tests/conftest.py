@@ -27,8 +27,8 @@ repos:
     lang: py
     glob: "**/*.py"
 synonyms:
-  kibble: economy
-  vertex: ai
+  credits: billing
+  llm: ai
 index_path: /tmp/test-index.json
 """
 
@@ -58,41 +58,41 @@ def sample_index():
     now = time.time()
     entries = [
         {
-            "path": "~/projects/clawed/lib/services/economy_service.dart",
-            "repo": "clawed",
+            "path": "~/projects/myapp/lib/services/billing_service.dart",
+            "repo": "myapp",
             "category": "code",
             "language": "dart",
-            "purpose": "EconomyService — manages Kibble balance and deductions",
-            "keywords": ["economy", "kibble", "balance", "deduction"],
+            "purpose": "BillingService — manages Credits balance and deductions",
+            "keywords": ["billing", "credits", "balance", "deduction"],
             "symbols": [
-                {"kind": "class", "name": "EconomyService"},
-                {"kind": "method", "name": "deductKibble", "parent": "EconomyService"},
-                {"kind": "method", "name": "getBalance", "parent": "EconomyService"},
+                {"kind": "class", "name": "BillingService"},
+                {"kind": "method", "name": "deductCredits", "parent": "BillingService"},
+                {"kind": "method", "name": "getBalance", "parent": "BillingService"},
             ],
             "mtime": now - 3600,  # 1 hour old
         },
         {
-            "path": "~/projects/clawed/lib/services/roast_service.dart",
-            "repo": "clawed",
+            "path": "~/projects/myapp/lib/services/task_service.dart",
+            "repo": "myapp",
             "category": "code",
             "language": "dart",
-            "purpose": "RoastService — dispatches Vertex AI roast requests",
-            "keywords": ["roast", "ai", "vertex", "gemini"],
+            "purpose": "TaskService — dispatches LLM task requests",
+            "keywords": ["task", "ai", "llm", "openai"],
             "symbols": [
-                {"kind": "class", "name": "RoastService"},
-                {"kind": "method", "name": "generateRoast", "parent": "RoastService"},
+                {"kind": "class", "name": "TaskService"},
+                {"kind": "method", "name": "runTask", "parent": "TaskService"},
             ],
             "mtime": now - 7200,  # 2 hours old
         },
         {
-            "path": "~/projects/clawed/lib/screens/camera_screen.dart",
-            "repo": "clawed",
+            "path": "~/projects/myapp/lib/screens/upload_screen.dart",
+            "repo": "myapp",
             "category": "code",
             "language": "dart",
-            "purpose": "CameraScreen — captures photo and triggers roast flow",
-            "keywords": ["camera", "screen", "photo", "capture"],
+            "purpose": "UploadScreen — captures photo and triggers task flow",
+            "keywords": ["upload", "screen", "photo", "capture"],
             "symbols": [
-                {"kind": "class", "name": "CameraScreen"},
+                {"kind": "class", "name": "UploadScreen"},
             ],
             "mtime": now - 100,  # very recent
         },

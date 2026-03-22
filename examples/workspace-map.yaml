@@ -10,7 +10,7 @@ repos:
 
   - path: ~/projects/myapp-backend
     name: backend
-    description: "Firebase Cloud Functions — HTTP endpoints, Firestore triggers, IAP validation"
+    description: "Cloud Functions — HTTP endpoints, database triggers, purchase validation"
 
   - path: ~/projects/shared-dart
     name: shared
@@ -28,9 +28,9 @@ extra_dirs:
 # Synonym expansion — terms that should match each other in search
 synonyms:
   - [auth, authentication, login, signin, sign-in]
-  - [iap, in_app_purchase, purchase, subscription, billing]
-  - [roast, analyze, caption, describe, generate]
-  - [kibble, currency, credits, balance, tokens]
+  - [purchase, in_app_purchase, subscription, billing, payment]
+  - [task, analyze, process, generate, execute]
+  - [credits, currency, balance, tokens, funds]
   - [widget, component, screen, view, page]
 
 # Directories to exclude from indexing (glob patterns, relative to repo root)
